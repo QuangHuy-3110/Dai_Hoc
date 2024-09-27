@@ -2,93 +2,98 @@
 #include <iostream>
 #include <stack>
 #include <queue>
+#include <malloc.h>
 
 #define so_dia 3
 const int A[] = {3, 2, 1};
 
 // Khai bao cau truc trang thai ---------------------------------------------
 typedef struct State {
-    std::stack<int> col_A;
-    std::stack<int> col_B;
-    std::stack<int> col_C;
+    int col_A[so_dia];
+    int no_A;
+    int col_B[so_dia];
+    int no_B;
+    int col_C[so_dia];
+    int no_C;
 }State;
 
 State create_goal (){
     State goal;
-    for (int i = 0; i < so_dia; i++)
-    {
-        goal.col_C.push(A[i]);
+    for (int i = 0; i < so_dia; i++){
+        goal.col_C[i] = A[i];        
     }
-    
+    goal.no_C = so_dia;
+    goal.no_A = 0;
+    goal.no_B = 0;
     return goal;
 }
 
 State goal = create_goal();
 // Cac hanh dong ------------------------------------------------------------
 int move_A_to_B (State cur_state, State *result){
-    if (cur_state.col_A.empty()){
+    if (cur_state.no_A == 0){
         return 0;
     }
     *result = cur_state;
-    int top_A = cur_state.col_A.top();
-    result->col_B.push(top_A);
-    result->col_A.pop();
+    result->no_B = cur_state.no_B + 1;
+    result->no_A = cur_state.no_A-1;
+    result->col_B[cur_state.no_B] = cur_state.col_A[cur_state.no_A-1];
     return 1;    
 }
 
 int move_A_to_C (State cur_state, State *result){
-    if (cur_state.col_A.empty()){
+    if (cur_state.no_A == 0){
         return 0;
     }
     *result = cur_state;
-    int top_A = cur_state.col_A.top();
-    result->col_C.push(top_A);
-    result->col_A.pop();
+    result->no_A = cur_state.no_A-1;
+    result->no_C = cur_state.no_C +1;    
+    result->col_C[cur_state.no_C] = cur_state.col_A[cur_state.no_A-1];
     return 1;    
 }
 
 int move_B_to_C (State cur_state, State *result){
-    if (cur_state.col_B.empty()){
+    if (cur_state.no_B == 0){
         return 0;
     }
     *result = cur_state;
-    int top_B = cur_state.col_B.top();
-    result->col_C.push(top_B);
-    result->col_B.pop();
-    return 1;    
+    result->no_B = cur_state.no_B-1;
+    result->no_C = cur_state.no_C+1; 
+    result->col_C[cur_state.no_C] = cur_state.col_B[cur_state.no_B-1];
+    return 1;
 }
 
 int move_B_to_A (State cur_state, State *result){
-    if (cur_state.col_B.empty()){
+    if (cur_state.no_B == 0){
         return 0;
     }
     *result = cur_state;
-    int top_B = cur_state.col_B.top();
-    result->col_A.push(top_B);
-    result->col_B.pop();
-    return 1;    
+    result->no_B = cur_state.no_B-1;
+    result->no_A = cur_state.no_A +1; 
+    result->col_A[cur_state.no_A] = cur_state.col_B[cur_state.no_B-1];
+    return 1;
 }
 
 int move_C_to_A (State cur_state, State *result){
-    if (cur_state.col_C.empty()){
+    if (cur_state.no_C == 0){
         return 0;
     }
     *result = cur_state;
-    int top_C = cur_state.col_C.top();
-    result->col_A.push(top_C);
-    result->col_C.pop();
-    return 1;    
+    result->no_C = cur_state.no_C-1;
+    result->no_A = cur_state.no_A +1; 
+    result->col_A[cur_state.no_A] = cur_state.col_C[cur_state.no_C-1];
+    return 1;
 }
 
 int move_C_to_B (State cur_state, State *result){
-    if (cur_state.col_C.empty()){
+    if (cur_state.no_C == 0){
         return 0;
     }
     *result = cur_state;
-    int top_C = cur_state.col_C.top();
-    result->col_B.push(top_C);
-    result->col_C.pop();
-    return 1;    
+    result->no_C = cur_state.no_C-1;
+    result->no_B = cur_state.no_B +1; 
+    result->col_B[cur_state.no_B] = cur_state.col_C[cur_state.no_C-1];
+    return 1;
 }
 
 const char* action [] = {"First State", "Move 1 plate A to B", "Move 1 plate A to C",
@@ -118,35 +123,42 @@ typedef struct Node{
 }Node;
 
 int compareStates (State a, State b){
-    // So sánh cột A
-    if (a.col_A.size() != b.col_A.size()) return 0;
-    std::stack<int> tmpA = a.col_A;
-    std::stack<int> tmpB = b.col_A;
-    while (!tmpA.empty() && !tmpB.empty()) {
-        if (tmpA.top() != tmpB.top()) return 0;
-        tmpA.pop();
-        tmpB.pop();
-    }
+    // So sánh c?t A
+    if (a.no_A != b.no_B){
+        return 0;
+    }    
+    else
+        for (int i = 0; i < a.no_A; i++){
+            if (a.col_A[i] != b.col_B[i]){
+                return 0;
+            }
+            
+        }
+    
 
-    // So sánh cột B
-    if (a.col_B.size() != b.col_B.size()) return 0;
-    tmpA = a.col_B;
-    tmpB = b.col_B;
-    while (!tmpA.empty() && !tmpB.empty()) {
-        if (tmpA.top() != tmpB.top()) return 0;
-        tmpA.pop();
-        tmpB.pop();
-    }
+    // So sánh c?t B
+    if (a.no_B != b.no_B){
+        return 0;
+    }    
+    else
+        for (int i = 0; i < a.no_B; i++){
+            if (a.col_B[i] != b.col_B[i]){
+                return 0;
+            }
+            
+        }
 
-    // So sánh cột C
-    if (a.col_C.size() != b.col_C.size()) return 0;
-    tmpA = a.col_C;
-    tmpB = b.col_C;
-    while (!tmpA.empty() && !tmpB.empty()) {
-        if (tmpA.top() != tmpB.top()) return 0;
-        tmpA.pop();
-        tmpB.pop();
-    }
+    // So sánh c?t C
+    if (a.no_C != b.no_C){
+        return 0;
+    }    
+    else
+        for (int i = 0; i < a.no_C; i++){
+            if (a.col_C[i] != b.col_C[i]){
+                return 0;
+            }
+            
+        }
     return 1;
 }
 
@@ -204,40 +216,37 @@ Node *DFS_Algorithm (State state){
     return NULL;
 }
 
-std::stack<int> invert_stack (std::stack<int> stack){
-    std::stack<int> tmp;
-    while (!stack.empty())
-    {
-        tmp.push(stack.top());
-        stack.pop();
-    }
-    return tmp;
-}
-
 void print_state (State state){
-    std::stack<int> tmp = invert_stack(state.col_A);
     printf("\nCot A: ");
-    while (!tmp.empty())
+    if (state.no_A == 0)
     {
-        printf("%d ", tmp.top());
-        tmp.pop();
+        printf("0");
     }
+    else    
+        for (int i = 0; i < state.no_A; i++){
+            printf("%d ", state.col_A[i]);
+        }
 
-    tmp = invert_stack(state.col_B);
     printf("\nCot B: ");
-    while (!tmp.empty())
+    if (state.no_B == 0)
     {
-        printf("%d ", tmp.top());
-        tmp.pop();
+        printf("0");
     }
+    else 
+        for (int i = 0; i < state.no_B; i++){
+            printf("%d ", state.col_B[i]);
+        }
 
-    tmp = invert_stack(state.col_C);
     printf("\nCot C: ");
-    while (!tmp.empty())
+    if (state.no_C == 0)
     {
-        printf("%d ", tmp.top());
-        tmp.pop();
-    }     
+        printf("0");
+    }
+    else 
+        for (int i = 0; i < state.no_C; i++){
+            printf("%d ", state.col_C[i]);
+        }    
+
 }
 
 //in ket qua chuyen nuoc de dat den muc tieu
@@ -249,7 +258,7 @@ void print_WayToGetGoal (Node *node){
         node = node->parent;
     }
     stackPrint.push(node);
-    //in ra thu tu hanh dong chuyen nuoc
+
     int no_action = 0;
     while (!stackPrint.empty()){
         printf("Action %d: %s", no_action, action[stackPrint.top()->no_action]);
@@ -261,28 +270,34 @@ void print_WayToGetGoal (Node *node){
 
 int main () {
     // State cur_state, result;
-    // cur_state.col_A.push(1);
-    // cur_state.col_B.push(3);
-    // cur_state.col_B.push(2);
+    // cur_state.col_A[0] = 1;
+    // cur_state.no_A = 1;
+    // cur_state.col_B[0] = 3;
+    // cur_state.col_B[1] = 2;
+    // cur_state.no_B = 2;
+    // cur_state.no_C = 0;
 
     // printf ("Trang thai bat dau");
     // print_state(cur_state);
-    // int otp;
-    // for (otp = 1; otp <= 6; otp ++){
-    //     int thuchien = call_operator (cur_state, &result, otp);
-    //     if (thuchien ==1 ){
-    //         printf ("\nHanh dong %s thanh cong", action[otp]);
-    //         print_state (result);
-    //     }
-    //     else {
-    //         printf("\nHanh dong %s KHONG thanh cong", action[otp]);
-    //     }
-    // }
+    //  int otp;
+    //  for (otp = 1; otp <= 6; otp ++){
+    //      int thuchien = call_operator (cur_state, &result, otp);
+    //      if (thuchien ==1 ){
+    //          printf ("\nHanh dong %s thanh cong", action[otp]);
+    //          print_state (result);
+    //      }
+    //      else {
+    //          printf("\nHanh dong %s KHONG thanh cong", action[otp]);
+    //      }
+    //  }
     // print_state(goal);
     State cur_state ;
-    cur_state.col_A.push(3);
-    cur_state.col_A.push(2);
-    cur_state.col_A.push(1);
+    cur_state.col_A[0] = 3;
+    cur_state.col_A[1] = 2;
+    cur_state.col_A[2] = 1;
+    cur_state.no_A = 3;
+    cur_state.no_B = 0;
+    cur_state.no_C = 0;
     Node *p = DFS_Algorithm(cur_state);
     print_WayToGetGoal(p); 
     return 0;
