@@ -164,9 +164,9 @@ int compareStates (State a, State b){
 
 
 // Tim trang thai trong stack open/close
-int find_State (State state, std::stack<Node*> openStack){
+int find_State (State state, std::queue<Node*> openStack){
     while (!openStack.empty()){
-        if (compareStates (openStack.top()->state, state)){
+        if (compareStates (openStack.front()->state, state)){
             return 1;
         }
         openStack.pop();
@@ -176,10 +176,10 @@ int find_State (State state, std::stack<Node*> openStack){
 
 // chay thuat toan --------------------------------------------------------------------------------
 //Thuat toan tim theo chieu sau
-Node *DFS_Algorithm (State state){
+Node *BFS_Algorithm (State state){
     //khai bao ngan xep Open/close 
-    std::stack<Node*> Open_DFS;
-    std::stack<Node*> Close_DFS;
+    std::queue<Node*> Open_DFS;
+    std::queue<Node*> Close_DFS;
     //tao nut trang thai cha
     Node *root = (Node*) malloc (sizeof(Node));
     root->state = state;
@@ -189,7 +189,7 @@ Node *DFS_Algorithm (State state){
 
     while (!Open_DFS.empty()){
         //lay mot dinh trong ngan xep
-        Node *node = Open_DFS.top();
+        Node *node = Open_DFS.front();
         Open_DFS.pop();
         Close_DFS.push(node);
         //kiem tra 1 dinh lay ra co phai trang thai muc tieu?
@@ -246,7 +246,7 @@ void print_state (State state){
         for (int i = 0; i < state.no_C; i++){
             printf("%d ", state.col_C[i]);
         }    
-
+    printf("\n");
 }
 
 //in ket qua chuyen nuoc de dat den muc tieu
@@ -295,10 +295,10 @@ int main () {
     cur_state.col_A[0] = 3;
     cur_state.col_A[1] = 2;
     cur_state.col_A[2] = 1;
-    cur_state.no_A = 3;
+    cur_state.no_A = so_dia;
     cur_state.no_B = 0;
     cur_state.no_C = 0;
-    Node *p = DFS_Algorithm(cur_state);
+    Node *p = BFS_Algorithm(cur_state);
     print_WayToGetGoal(p); 
     return 0;
 }
