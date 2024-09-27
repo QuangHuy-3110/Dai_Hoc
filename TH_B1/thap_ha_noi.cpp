@@ -5,7 +5,6 @@
 #include <malloc.h>
 
 #define so_dia 3
-const int A[] = {3, 2, 1};
 
 // Khai bao cau truc trang thai ---------------------------------------------
 typedef struct State {
@@ -20,7 +19,7 @@ typedef struct State {
 State create_goal (){
     State goal;
     for (int i = 0; i < so_dia; i++){
-        goal.col_C[i] = A[i];        
+        goal.col_C[i] = i+1;        
     }
     goal.no_C = so_dia;
     goal.no_A = 0;
