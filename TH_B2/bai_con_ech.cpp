@@ -195,12 +195,5 @@ int main()
         }
     }
 
-    // Kiểm tra trạng thái đích (nếu có định nghĩa)
-    // if (check_goal(state, goal)) {
-    //     printf("Da dat duoc trang thai dich!\n");
-    // } else {
-    //     printf("Chua dat duoc trang thai dich.\n");
-    // }
-
     return 0;
 }
