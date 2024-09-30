@@ -4,7 +4,7 @@
 #define Xmax 5
 #define Ymax 3
 
-#define both 8
+#define bottle 8
 #define goal 4
 #define empty 0
 #define Maxlength 100
